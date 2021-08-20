@@ -109,7 +109,7 @@ def export(export_format="ESRI Shapefile", full=False):
         ending = ".shp"
 
     hash_plan = hashlib.sha256(str(plan).encode()).hexdigest()
-    filename = plan["id"] + "-export-" + hash_plan[0:12] + "-" + driver + "-" + ending
+    filename = plan["id"] + "-export-" + hash_plan[0:12] + ending
 
     url = f"{BASE_URL}/{filename}.zip"
     print(url, requests.get(url).status_code)
@@ -120,10 +120,12 @@ def export(export_format="ESRI Shapefile", full=False):
     shp = fetch_shapefile(shapefile_uri)
     assignment = {}
     for k, v in plan["assignment"].items():
+        if isinstance(k, list):
+            k = k[0]
         if isinstance(v, list):
-            assignment[k] = v[0]
-        else:
-            assignment[k] = v
+            v = v[0]
+
+        assignment[k] = v
 
     print(assignment)
 
