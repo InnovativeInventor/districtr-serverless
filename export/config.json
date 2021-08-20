@@ -81,6 +81,8 @@
         "napa_boe": "shapefiles/california/napa_edu",
         "ca_oakland": "shapefiles/california/ca_oakland",
         "ca_kern": "shapefiles/california/ca_kern",
+	"ca_butte": "shapefiles/california/ca_butte_2",
+	"ca_butte_20": "shapefiles/california/ca_butte_2",
         "ca_butte": "shapefiles/california/ca_butte",
         "ca_humboldt": "shapefiles/california/ca_humboldt",
         "carpinteria": "shapefiles/california/carpinteria",
@@ -96,6 +98,8 @@
         "halfmoon": "shapefiles/california/halfmoon",
         "ca_stockton": "shapefiles/california/stockton",
         "lodi": "shapefiles/california/lodi",
+	"rp_lax": "shapefiles/california/lax_2020",
+	"rp_lax_20": "shapefiles/california/lax_2020",
 
     "colorado": "shapefiles/colorado/co_precincts",
         "colorado_bg": "shapefiles/colorado/tl_2010_08_bg10",
@@ -149,7 +153,7 @@
         "iowa_bg_20": "shapefiles/iowa/ia_bg",
 
     "kansas_bg": "shapefiles/kansas/tl_2010_20_bg10",
-    "kansas_bg": "shapefiles/kansas/ks_bg",
+    "kansas_bg_20": "shapefiles/kansas/ks_bg",
 
     "kentucky_bg": "shapefiles/kentucky/tl_2010_21_bg10",
     "kentucky_bg_20": "shapefiles/kentucky/ky_bg",

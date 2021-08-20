@@ -20,6 +20,7 @@ app.config['Access-Control-Allow-Origin'] = '*'
 s3 = boto3.client("s3")
 session = boto3.Session()
 BASE_URL = "https://d3axno55psi0h1.cloudfront.net"
+CACHE = False
 
 
 def generate_shapefile_uri(plan: dict) -> str:
@@ -29,19 +30,21 @@ def generate_shapefile_uri(plan: dict) -> str:
     with open("config.json") as f:
         config = json.loads("".join([x.split("#")[0] for x in f]))
 
-
     state = plan["placeId"]
     shapefile_code = state
+    if (plan['units']['id'] in ['blockgroups', 'blockgroups20']) and ('_bg' not in shapefile_code):
+        shapefile_code += '_bg'
+    elif plan['units']['id'] == 'blocks' and state in ['elpasotx']:
+        shapefile_code += '_b'
 
-    if plan["units"]["id"] == "blockgroups" and "_bg" not in shapefile_code:
-        shapefile_code += "_bg"
-    elif plan["units"]["id"] == "blocks" and state in ["elpasotx"]:
-        shapefile_code += "_b"
+    if plan['units']['id'] == 'precincts_02_10':
+        shapefile_code += '_02'
+    elif plan['units']['id'] == 'precincts_12_16':
+        shapefile_code += '_12'
 
-    if plan["units"]["id"] == "precincts_02_10":
-        shapefile_code += "_02"
-    elif plan["units"]["id"] == "precincts_12_16":
-        shapefile_code += "_12"
+    if (plan['units']['name'] == '2020 Block Groups'):
+        # all 2020 block groups
+        shapefile_code += '_20'
 
     return config[shapefile_code]
 
@@ -66,8 +69,8 @@ def fetch_shapefile(shapefile_uri: str, dir_prefix="/tmp/"):
         if not os.path.isfile(filename):
             try:
                 s3.download_file("districtr", filename, dir_prefix + filename)
-            except botocore.exceptions.ClientError:  # TODO: log this properly
-                print(filename)
+            except botocore.exceptions.ClientError as e:  # TODO: log this properly
+                print(filename, e)
 
     return gpd.read_file(dir_prefix + shapefile_uri + ".shp")
 
@@ -110,14 +113,19 @@ def export(export_format="ESRI Shapefile", full=False):
 
     url = f"{BASE_URL}/{filename}.zip"
     print(url, requests.get(url).status_code)
-    if requests.get(url).status_code == 200:
+    if requests.get(url).status_code == 200 and CACHE:
         return flask.redirect(url)
 
     shapefile_uri = generate_shapefile_uri(plan)
     shp = fetch_shapefile(shapefile_uri)
-    assignment = {
-        k[0]: v if isinstance(k, list) else k for k, v in plan["assignment"].items()
-    }
+    assignment = {}
+    for k, v in plan["assignment"].items():
+        if isinstance(v, list):
+            assignment[k] = v[0]
+        else:
+            assignment[k] = v
+
+    print(assignment)
 
     if coi_mode:  # coi_mode will return a partial map of the state
         shp = shp[assignment.keys()]
