@@ -109,7 +109,7 @@ def export(export_format="ESRI Shapefile", full=False):
         ending = ".shp"
 
     hash_plan = hashlib.sha256(str(plan).encode()).hexdigest()
-    filename = plan["id"] + "-export-" + hash_plan[0:12] + ending
+    filename = plan["id"] + "-export-" + hash_plan[0:12] + "-" + driver + "-" + ending
 
     url = f"{BASE_URL}/{filename}.zip"
     print(url, requests.get(url).status_code)
