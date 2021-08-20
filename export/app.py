@@ -20,7 +20,7 @@ app.config['Access-Control-Allow-Origin'] = '*'
 s3 = boto3.client("s3")
 session = boto3.Session()
 BASE_URL = "https://d3axno55psi0h1.cloudfront.net"
-CACHE = False
+CACHE = True
 
 
 def generate_shapefile_uri(plan: dict) -> str:
