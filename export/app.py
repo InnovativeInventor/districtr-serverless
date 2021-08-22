@@ -127,18 +127,19 @@ def export(export_format="ESRI Shapefile", full=False):
 
         assignment[k] = v
 
+    idColumn = plan["idColumn"]["key"]
+
     print(assignment)
 
     if coi_mode:  # coi_mode will return a partial map of the state
-        try:
-            shp = shp[assignment.keys()]
-        except KeyError:
-            shp.index = shp.index.astype(str)
-            shp = shp[assignment.keys()]
-            print(shp.index.dtype)
+        print(shp.index.dtype)
+        mask = shp[idColumn]==assignment.keys()
+        if not mask.any():
+            mask = shp[idColumn].apply(lambda x: str(x) in assignment)
+
+        shp = shp[mask]
 
     # The shapefile will default to -1 if unassigned
-    idColumn = plan["idColumn"]["key"]
     shp["districtr"] = shp[idColumn].apply(lambda x: assignment.get(x, -1)).astype("int32")
     if (shp["districtr"] == -1).all():
         shp["districtr"] = shp[idColumn].astype("Int64").astype(str).apply(lambda x: assignment.get(x, -1)).astype("int32")
