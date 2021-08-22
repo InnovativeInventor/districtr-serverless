@@ -20,7 +20,7 @@ app.config['Access-Control-Allow-Origin'] = '*'
 s3 = boto3.client("s3")
 session = boto3.Session()
 BASE_URL = "https://d3axno55psi0h1.cloudfront.net"
-CACHE = True
+CACHE = False
 
 
 def generate_shapefile_uri(plan: dict) -> str:
@@ -135,6 +135,10 @@ def export(export_format="ESRI Shapefile", full=False):
     # The shapefile will default to -1 if unassigned
     idColumn = plan["idColumn"]["key"]
     shp["districtr"] = shp[idColumn].apply(lambda x: assignment.get(x, -1)).astype("int32")
+    if (shp["districtr"] == -1).all():
+        shp["districtr"] = shp[idColumn].astype("Int64").astype(str).apply(lambda x: assignment.get(x, -1)).astype("int32")
+
+    print(shp["districtr"])
 
     if full:
         return create_export(shp, filename, ending=ending, driver=driver)
