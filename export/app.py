@@ -130,7 +130,12 @@ def export(export_format="ESRI Shapefile", full=False):
     print(assignment)
 
     if coi_mode:  # coi_mode will return a partial map of the state
-        shp = shp[assignment.keys()]
+        try:
+            shp = shp[assignment.keys()]
+        except KeyError:
+            shp.index = shp.index.astype(str)
+            shp = shp[assignment.keys()]
+            print(shp.index.dtype)
 
     # The shapefile will default to -1 if unassigned
     idColumn = plan["idColumn"]["key"]
